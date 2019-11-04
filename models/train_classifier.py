@@ -54,7 +54,7 @@ def load_data(database_filepath):
     category_names = list(df.columns[4:])
     
     # The "related" class variable has three categories,so replaced 2s with 1s
-     Y.related = Y.related.replace(2,1)
+    Y.related = Y.related.replace(2,1)
 
     
     return X, Y, category_names
