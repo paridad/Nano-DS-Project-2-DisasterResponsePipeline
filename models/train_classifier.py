@@ -1,5 +1,10 @@
 # Import necessary Python modules/packages
 
+import nltk
+nltk.download('wordnet')
+nltk.download('punkt')
+nltk.download('stopwords')
+
 import sys
 import nltk
 import re
@@ -12,6 +17,8 @@ from pytz import timezone
 
 
 import pickle
+from sklearn.externals import joblib
+
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
@@ -46,6 +53,10 @@ def load_data(database_filepath):
     Y = df.iloc[:,4:]
     category_names = list(df.columns[4:])
     
+    # The "related" class variable has three categories,so replaced 2s with 1s
+     Y.related = Y.related.replace(2,1)
+
+    
     return X, Y, category_names
 
 
@@ -58,24 +69,33 @@ def tokenize(text):
     Output:clean_tokens:
 
     '''
+ #   url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+' 
     
     # Normalize text
-    text = re.sub(r"[^a-zA-Z0-9]", ' ', text.lower())
+    text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
 
+ #   detected_urls = re.findall(url_regex, text)
+ #   for url in detected_urls:
+ #       text = text.replace(url, "urlplaceholder")
+    
     # Tokenize text
     tokens = word_tokenize(text)
     
     # Remove Stopwords
-    tokens = [t for t in tokens if t not in stopwords.words("english")]
+ #   tokens = [t for t in tokens if t not in stopwords.words("english")]
     
     lemmatizer = WordNetLemmatizer()
+    stop_words = stopwords.words("english")
 
-    clean_tokens = []
-    for tok in tokens:
-        clean_tok = lemmatizer.lemmatize(tok).lower().strip()
-        clean_tokens.append(clean_tok)
+  #  clean_tokens = []
+  #  for tok in tokens:
+  #      clean_tok = lemmatizer.lemmatize(tok).lower().strip()
+  #      clean_tokens.append(clean_tok)
 
-    return clean_tokens
+    tokens = [lemmatizer.lemmatize(word) for word in tokens if word not in stop_words]
+
+    
+    return tokens
 
 
 def build_model():
@@ -89,16 +109,18 @@ def build_model():
     '''
     # Create Pipeline for 3 estimators(Vectorizer, TFid, Multioutput Classifier
     pipeline = Pipeline([
-    ('vectorizer', CountVectorizer()),
+    ('vectorizer', CountVectorizer(tokenizer=tokenize)),
     ('tfidf', TfidfTransformer()),
     ('clf', MultiOutputClassifier(RandomForestClassifier()))])
     
     # Set  Hyperestimator values for GridSearchCV
     
-    parameters = {'clf__estimator__n_estimators': [50],
-                  'clf__estimator__min_samples_split': [2, 4, 6],
-                  'clf__estimator__max_depth': [2,5,10],
-                  'clf__estimator__min_samples_leaf': [3,4,5]
+    parameters = {
+                  'clf__estimator__n_estimators': [50,100],
+                  'clf__estimator__min_samples_split': [2, 4],
+                  'clf__estimator__max_depth': [2,5],
+                 'clf__estimator__class_weight': ['balanced']
+              #    'clf__estimator__min_samples_leaf': [3,4,5]
                   
                  }
 

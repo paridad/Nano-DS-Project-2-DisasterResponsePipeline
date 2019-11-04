@@ -45,6 +45,13 @@ def index():
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
     
+    # data for Category Counts Bar graphs
+
+    cat_sums = df.iloc[:, 4:].sum()
+    cat_names = list(cat_sums.index)
+
+
+    
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
     graphs = [
@@ -65,6 +72,46 @@ def index():
                     'title': "Genre"
                 }
             }
+        },
+     
+        # Add new horibar graph Category counts distribution   
+        {
+
+            'data': [
+
+                Bar(
+
+                    x=cat_sums,
+
+                    y=cat_names,
+                    orientation = 'h'
+                  
+                    
+                    
+                )
+
+            ],
+
+
+
+            'layout': {
+
+                'title': 'Category values Distribution',
+
+                'yaxis': {
+
+                    'title': "Category"
+
+                },
+
+                'xaxis': {
+
+                    'title': "count"
+
+                },
+
+            }
+
         }
     ]
     
@@ -85,6 +132,10 @@ def go():
     # use model to predict classification for query
     classification_labels = model.predict([query])[0]
     classification_results = dict(zip(df.columns[4:], classification_labels))
+    
+    print(query)
+    print(classification_labels)
+    print(classification_results)
 
     # This will render the go.html Please see that file. 
     return render_template(
@@ -95,8 +146,8 @@ def go():
 
 
 def main():
-  #  app.run(host='0.0.0.0', port=3001, debug=True)
-    app.run(host='127.0.0.1', port=8000, debug=True)
+    app.run(host='0.0.0.0', port=3001, debug=True)
+  #  app.run(host='127.0.0.1', port=8000, debug=True)
 
 
 if __name__ == '__main__':
