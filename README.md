@@ -77,6 +77,8 @@ I have  selected  a Supervised ML  “Random Forest Classification” model  to 
 ![Visualization-3](https://github.com/paridad/Nano-DS-Project-2-DisasterResponsePipeline/blob/master/Visualization-3.png)
 
 ![Visualization-4](https://github.com/paridad/Nano-DS-Project-2-DisasterResponsePipeline/blob/master/Visualization-4.jpg)
+![Visualization-5](https://github.com/paridad/Nano-DS-Project-2-DisasterResponsePipeline/blob/master/Visualization-5.svg)
+![Visualization-6](https://github.com/paridad/Nano-DS-Project-2-DisasterResponsePipeline/blob/master/Visualization-6.svg)
 
 
 
